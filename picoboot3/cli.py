@@ -10,6 +10,7 @@ For more information about Picoboot3, see https://github.com/IndoorCorgi/picoboo
 from argparse import ArgumentParser, RawTextHelpFormatter, RawDescriptionHelpFormatter
 from .picoboot3_uart import Picoboot3uart
 from .picoboot3_i2c import Picoboot3i2c
+from .picoboot3_i2c_tiny_usb import Picoboot3i2cTinyUsb
 from .picoboot3_spi import Picoboot3spi
 
 
@@ -31,7 +32,7 @@ def cli():
   parser.add_argument('--file', '-f', help='Firmware .bin file to program or verify')
   parser.add_argument('--interface',
                       '-i',
-                      choices=['uart', 'i2c', 'spi'],
+                      choices=['uart', 'i2c', 'i2c-tiny-usb', 'spi'],
                       default='uart',
                       help='Default is uart.')
   parser.add_argument('--port',
@@ -43,6 +44,8 @@ def cli():
                       default=500000,
                       help='UART/SPI baudrate [bps/Hz]. Default is 500000.')
   parser.add_argument('--bus', type=int, default=1, help='I2C/SPI bus address. Default is 1.')
+  parser.add_argument('--vendor_id', type=int, default=0x0403, help='I2C-tiny-usb vendor-id. Default is 0x0403.')
+  parser.add_argument('--product_id', type=int, default=0xc631, help='I2C-tiny-usb product-id. Default is 0xc631.')
   parser.add_argument('--device',
                       '-d',
                       type=lambda x: int(x, 0),
@@ -85,6 +88,16 @@ def cli():
   elif args.interface == 'i2c':
     picoboot3 = Picoboot3i2c(
         bus_address=args.bus,
+        device_address=args.device,
+        verbous=True,
+        appcode_offset=args.offset * 1024,
+        transfer_size=args.transfer_size,
+    )
+    picoboot3.open()
+  elif args.interface == 'i2c-tiny-usb':
+    picoboot3 = Picoboot3i2cTinyUsb(
+        vendor_id=args.vendor_id,
+        product_id=args.product_id,
         device_address=args.device,
         verbous=True,
         appcode_offset=args.offset * 1024,
