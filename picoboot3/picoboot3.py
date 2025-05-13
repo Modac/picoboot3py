@@ -213,7 +213,8 @@ class Picoboot3:
     try:
       if (self.activate_command() == self.activate_response):
         return True
-    except:
+    except Exception as e:
+      print(e)
       return False
     return False
 
