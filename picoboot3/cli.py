@@ -12,6 +12,7 @@ from .picoboot3_uart import Picoboot3uart
 from .picoboot3_i2c import Picoboot3i2c
 from .picoboot3_i2c_tiny_usb import Picoboot3i2cTinyUsb
 from .picoboot3_spi import Picoboot3spi
+from timeit import default_timer as timer
 
 
 def cli():
@@ -142,11 +143,14 @@ def cli():
       print('Verify after erase failed')
       return 1
 
+  start_time = timer()
+
   if args.command == 'program':
     picoboot3.erase(range(first_erase_sector, first_erase_sector + num_of_erase_sectors))
     if not picoboot3.program(picoboot3.appcode_offset, fw_data):
       print('Program failed')
       return 1
+    print("Took {}s".format(timer()-start_time))
 
     if args.app:
       print('Start application code')
