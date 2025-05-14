@@ -41,6 +41,14 @@ class Picoboot3i2cTinyUsb(Picoboot3):
     import usb.core
     self.i2c_usb_dev = usb.core.find(idVendor=self.vendor_id, idProduct=self.product_id)
     print("I2C-tiny-usb dev: {}".format(self.i2c_usb_dev))
+    self.i2c_usb_dev.ctrl_transfer(
+            0x40,                 # bmRequestType: Vendor Host-to-Device (0x02<<5)
+            2,                    # bRequest
+            1,                    # wValue: delay
+            0,                    # wIndex: unused
+            None,                 # payload: unused
+            1000                  # Timeout
+        )
 
   def receive_bytes_old(self, length):
     """
@@ -106,7 +114,8 @@ class Picoboot3i2cTinyUsb(Picoboot3):
         #remaining -= len(msg)
         remaining -= chunk_size
         chunk_count += 1
-        time.sleep(0.01)  # Short delay
+        # TODO: check status
+        #time.sleep(0.001)  # Short delay not needed if an additional delay is added before the verify read (after check status in program)
 
     #print("I2C-tiny-usb rec msg: {}".format(bytes(received).hex('-')))
     return bytes(received)
@@ -165,6 +174,7 @@ class Picoboot3i2cTinyUsb(Picoboot3):
             chunk,                # Data payload
             1000                  # Timeout
         )
-        time.sleep(0.01)  # Short delay
+        # TODO: check status, for now just delay
+        time.sleep(0.002)  # Short delay  2ms should be safe for this specific device (I2C-Mega-USB on Pro Micro Clone, delay:1)
 
     #print("I2C-tiny-usb send ret: {}".format(total_sent))

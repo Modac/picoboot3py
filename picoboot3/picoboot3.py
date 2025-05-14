@@ -171,6 +171,7 @@ class Picoboot3:
     self.send_bytes(send_data)
     while (not self.is_ready()):
       time.sleep(0.001)
+    time.sleep(0.005)
 
   def erase_command(self, sector):
     """
